@@ -1,0 +1,46 @@
+{
+  "name": "my-app",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "tauri": "tauri",
+    "format": "prettier . -w -l",
+    "prepare": "husky"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.0.9",
+    "@tauri-apps/api": "^2.3.0",
+    "@tauri-apps/plugin-opener": "^2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tailwindcss": "^4.0.9"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.21.0",
+    "@tauri-apps/cli": "^2",
+    "@types/node": "^22.13.17",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@vitejs/plugin-react-swc": "^3.8.0",
+    "eslint": "^9.21.0",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "globals": "^15.15.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.4.3",
+    "prettier": "3.5.2",
+    "typescript": "~5.7.2",
+    "typescript-eslint": "^8.24.1",
+    "vite": "^6.2.0"
+  },
+  "packageManager": "pnpm@10.2.1+sha512.398035c7bd696d0ba0b10a688ed558285329d27ea994804a52bad9167d8e3a72bcb993f9699585d3ca25779ac64949ef422757a6c31102c12ab932e5cbe5cc92",
+  "lint-staged": {
+    "*.js": "eslint --cache --fix",
+    "*.-l": "prettier --write -l"
+  }
+}
