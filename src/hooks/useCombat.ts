@@ -28,8 +28,10 @@ export interface UseCombatReturn {
   selectTargets: (targetIds: string[]) => void;
   /** Cancel target selection and return to action select */
   cancelTargetSelection: () => void;
-  /** Dismiss current dialog */
+  /** Dismiss current dialog (only for dialogs without choices) */
   dismissDialog: () => void;
+  /** Select a choice in the current dialog */
+  selectDialogChoice: (choiceId: string) => void;
   /** End the battle and clean up */
   endBattle: () => void;
   /** Whether currently in a battle */
@@ -121,10 +123,17 @@ export function useCombat(statEngine: StatEngine, game: GameDefinition): UseComb
   }, []);
 
   /**
-   * Dismiss current battle dialog
+   * Dismiss current battle dialog (only for dialogs without choices)
    */
   const dismissDialog = useCallback(() => {
     machineRef.current?.dismissDialog();
+  }, []);
+
+  /**
+   * Select a choice in the current dialog
+   */
+  const selectDialogChoice = useCallback((choiceId: string) => {
+    machineRef.current?.selectDialogChoice(choiceId);
   }, []);
 
   /**
@@ -142,6 +151,7 @@ export function useCombat(statEngine: StatEngine, game: GameDefinition): UseComb
     selectTargets,
     cancelTargetSelection,
     dismissDialog,
+    selectDialogChoice,
     endBattle,
     isInBattle: initialized && snapshot !== null
   };

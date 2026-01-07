@@ -12,7 +12,7 @@ import { ModifierStack } from '../stats/ModifierStack';
 import { ActionExecutor, ActionEffect } from './ActionExecutor';
 import { EnemyAI } from './EnemyAI';
 import { BattleTriggerEngine } from './BattleTriggerEngine';
-import type { BattleTriggerAction } from '../../types/scene';
+import type { BattleTriggerAction, BattleDialogChoice } from '../../types/scene';
 
 /**
  * Combat phases representing the state machine states
@@ -102,6 +102,8 @@ export interface DialogEntry {
   speaker: string;
   /** Dialog text */
   text: string;
+  /** Optional choices for player response */
+  choices?: BattleDialogChoice[];
 }
 
 /**
@@ -623,7 +625,7 @@ export class CombatStateMachine {
   private handleTriggerAction(action: BattleTriggerAction): void {
     switch (action.type) {
       case 'dialog':
-        this.queueDialog(action.speaker ?? 'Narrator', action.text);
+        this.queueDialog(action.speaker ?? 'Narrator', action.text, action.choices);
         break;
 
       case 'spawn': {
@@ -764,8 +766,8 @@ export class CombatStateMachine {
   /**
    * Queue a dialog to show during battle
    */
-  queueDialog(speaker: string, text: string): void {
-    this.dialogQueue.push({ speaker, text });
+  queueDialog(speaker: string, text: string, choices?: BattleDialogChoice[]): void {
+    this.dialogQueue.push({ speaker, text, choices });
     if (this.phase !== 'dialog') {
       this.showNextDialog();
     }
@@ -773,13 +775,49 @@ export class CombatStateMachine {
 
   /**
    * Dismiss current dialog and show next (or resume battle)
+   * Only works for dialogs without choices
    */
   dismissDialog(): void {
+    const currentDialog = this.dialogQueue[0];
+
+    // Don't dismiss if dialog has choices - user must select one
+    if (currentDialog?.choices && currentDialog.choices.length > 0) {
+      return;
+    }
+
     this.dialogQueue.shift();
     if (this.dialogQueue.length > 0) {
       this.showNextDialog();
     } else {
       // Resume previous phase
+      this.phase = this.previousPhase;
+      this.emit();
+    }
+  }
+
+  /**
+   * Select a choice in the current dialog
+   * Executes the choice's action and advances the dialog
+   */
+  selectDialogChoice(choiceId: string): void {
+    const currentDialog = this.dialogQueue[0];
+    if (!currentDialog?.choices) return;
+
+    const choice = currentDialog.choices.find(c => c.id === choiceId);
+    if (!choice) return;
+
+    // Remove current dialog
+    this.dialogQueue.shift();
+
+    // Execute choice action if any
+    if (choice.action) {
+      this.handleTriggerAction(choice.action);
+    }
+
+    // Continue with next dialog or resume battle
+    if (this.dialogQueue.length > 0) {
+      this.showNextDialog();
+    } else {
       this.phase = this.previousPhase;
       this.emit();
     }

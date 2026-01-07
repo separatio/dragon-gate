@@ -107,9 +107,22 @@ export interface BattleTrigger {
   action: BattleTriggerAction;
 }
 
+/**
+ * A choice within battle dialog
+ * When selected, executes an optional action and advances dialog
+ */
+export interface BattleDialogChoice {
+  /** Unique identifier for this choice */
+  id: string;
+  /** Display text for the choice button */
+  text: string;
+  /** Optional action to execute when selected */
+  action?: BattleTriggerAction;
+}
+
 /** Action executed by a battle trigger */
 export type BattleTriggerAction =
-  | { type: 'dialog'; speaker?: string; text: string }
+  | { type: 'dialog'; speaker?: string; text: string; choices?: BattleDialogChoice[] }
   | { type: 'spawn'; enemyId: string }
   | { type: 'buff'; target?: string; stat: string; value: number; duration?: number }
   | { type: 'heal'; target?: string; amount: number }
