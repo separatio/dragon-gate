@@ -78,7 +78,7 @@ export interface FunctionCallNode {
   args: ASTNode[];
 }
 
-/** Context object mapping variable names to numeric values */
+/** Context object mapping variable names to numeric values or nested contexts */
 export interface FormulaContext {
-  [key: string]: number;
+  [key: string]: number | FormulaContext;
 }

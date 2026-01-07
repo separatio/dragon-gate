@@ -21,10 +21,9 @@ export interface TriggerResult {
 
 /**
  * Context for trigger condition evaluation
- * Supports nested objects for dot notation (e.g., enemy.hpPercent)
- * Note: FormulaParser's resolveIdentifier handles nested objects at runtime
+ * Extends FormulaContext to support nested objects for dot notation (e.g., enemy.hpPercent)
  */
-export interface TriggerContext {
+export interface TriggerContext extends FormulaContext {
   /** Current turn number */
   turn: number;
   /** Number of living players */
@@ -35,8 +34,6 @@ export interface TriggerContext {
   totalPlayers: number;
   /** Total enemies */
   totalEnemies: number;
-  /** Indexed combatant data (e.g., enemy.hpPercent, player.currentHp) */
-  [key: string]: number | Record<string, number>;
 }
 
 /**
@@ -103,9 +100,8 @@ export class BattleTriggerEngine {
       if (!this.canFire(trigger)) continue;
 
       // Evaluate condition
-      // Cast to FormulaContext - the parser's resolveIdentifier handles nested objects at runtime
       try {
-        const conditionResult = this.parser.compute(trigger.condition, context as unknown as FormulaContext);
+        const conditionResult = this.parser.compute(trigger.condition, context);
         if (conditionResult) {
           // Condition is truthy, fire the trigger
           this.recordFire(trigger);

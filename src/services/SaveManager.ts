@@ -120,13 +120,16 @@ export const SaveManager = {
         return { success: false, error: 'Save slot is empty' };
       }
 
-      const data = JSON.parse(json) as SaveData;
+      const parsed: unknown = JSON.parse(json);
 
-      // Validate loaded data
-      const validationError = this.validate(data);
+      // Validate loaded data structure
+      const validationError = this.validate(parsed as SaveData);
       if (validationError) {
         return { success: false, error: validationError };
       }
+
+      // Safe to assert type after validation passes
+      const data = parsed as SaveData;
 
       // Handle version migration if needed
       const migratedData = this.migrate(data);
@@ -185,12 +188,26 @@ export const SaveManager = {
         return createEmptySaveSlotInfo();
       }
 
-      const data = JSON.parse(json) as SaveData;
-      return {
-        isEmpty: false,
-        metadata: data.metadata,
-      };
+      const parsed: unknown = JSON.parse(json);
+
+      // Basic structure check before accessing metadata
+      if (
+        typeof parsed === 'object' &&
+        parsed !== null &&
+        'metadata' in parsed &&
+        typeof (parsed as { metadata: unknown }).metadata === 'object'
+      ) {
+        const data = parsed as SaveData;
+        return {
+          isEmpty: false,
+          metadata: data.metadata,
+        };
+      }
+
+      // Invalid structure, treat as empty
+      return createEmptySaveSlotInfo();
     } catch {
+      // JSON parse error, treat as empty slot
       return createEmptySaveSlotInfo();
     }
   },
@@ -296,12 +313,16 @@ export const SaveManager = {
    */
   importSave(slot: number, json: string): SaveResult {
     try {
-      const data = JSON.parse(json) as SaveData;
+      const parsed: unknown = JSON.parse(json);
 
-      const validationError = this.validate(data);
+      // Validate structure first
+      const validationError = this.validate(parsed as SaveData);
       if (validationError) {
         return { success: false, error: validationError };
       }
+
+      // Safe to assert type after validation passes
+      const data = parsed as SaveData;
 
       // Update slot in metadata
       data.metadata.slot = slot;
