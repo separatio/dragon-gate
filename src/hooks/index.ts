@@ -10,3 +10,9 @@ export { useChoiceEvaluator } from './useChoiceEvaluator';
 export { useCombat } from './useCombat';
 export type { UseCombatReturn } from './useCombat';
 export { useAutoSave, AUTO_SAVE_SLOT } from './useAutoSave';
+export {
+  useKeyboardShortcuts,
+  createGameShortcuts,
+  createCombatShortcuts,
+} from './useKeyboardShortcuts';
+export type { KeyboardShortcut } from './useKeyboardShortcuts';

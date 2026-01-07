@@ -3,13 +3,14 @@
  * Integrates scene engine with UI components for story mode gameplay
  */
 
-import { useEffect, useContext, useCallback, useRef } from 'react';
+import { useEffect, useContext, useCallback, useRef, useMemo } from 'react';
 import { BottomPanelContext, ChoiceOption } from '../../components/BottomPanel/BottomPanelContext';
 import { LoadingSpinner } from '../../components/Loading';
 import { useSceneEngine } from '../../hooks/useSceneEngine';
 import { useGameLoader } from '../../hooks/useGameLoader';
 import { useChoiceEvaluator } from '../../hooks/useChoiceEvaluator';
 import { useAutoSave } from '../../hooks/useAutoSave';
+import { useKeyboardShortcuts, createGameShortcuts } from '../../hooks/useKeyboardShortcuts';
 import { ScreenContext, Screen } from '../../ScreenProvider';
 import BattleScreen from './BattleScreen';
 import type { Choice } from '../../types';
@@ -135,24 +136,33 @@ export default function StoryScreen() {
     };
   }, [state.type, handleAdvance]);
 
-  // Keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        if (state.type === 'story') {
-          e.preventDefault();
-          handleAdvance();
-        }
+  // Handle choice selection by number key
+  const handleChoiceByIndex = useCallback(
+    (index: number) => {
+      if (state.type !== 'choices') return;
+      const choice = state.choices[index];
+      if (choice) {
+        selectChoice(choice.id);
       }
-      if (e.key === 'Escape') {
-        // Return to menu
-        screenContext?.setCurrentScreen(Screen.MainMenu);
-      }
-    };
+    },
+    [state, selectChoice]
+  );
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [state.type, handleAdvance, screenContext]);
+  // Keyboard shortcuts
+  const shortcuts = useMemo(
+    () =>
+      createGameShortcuts({
+        onAdvance: state.type === 'story' ? handleAdvance : undefined,
+        onMenu: () => screenContext?.setCurrentScreen(Screen.MainMenu),
+        onChoice: state.type === 'choices' ? handleChoiceByIndex : undefined,
+      }),
+    [state.type, handleAdvance, screenContext, handleChoiceByIndex]
+  );
+
+  useKeyboardShortcuts({
+    enabled: state.type !== 'battle',
+    shortcuts,
+  });
 
   // Loading state
   if (loading) {
