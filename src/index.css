@@ -1090,6 +1090,56 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ==========================================
+   AUTO-SAVE INDICATOR
+   ========================================== */
+
+.auto-save-indicator {
+  position: fixed;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-md);
+  background: var(--color-surface-elevated);
+  border-radius: var(--border-radius-md);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  font-family: var(--font-family-ui);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  z-index: 900;
+  animation: autoSaveFadeIn 0.3s ease-out;
+}
+
+@keyframes autoSaveFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.auto-save-indicator__icon {
+  animation: autoSavePulse 0.8s ease-in-out infinite;
+}
+
+@keyframes autoSavePulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.auto-save-indicator__text {
+  color: var(--color-text);
+}
+
+/* ==========================================
    MODAL STYLES
    ========================================== */
 
@@ -1363,6 +1413,25 @@ h1, h2, h3, h4, h5, h6 {
 
 .save-slot--selected .save-slot__warning {
   opacity: 1;
+}
+
+/* Auto-save slot styling */
+.save-slot--auto .save-slot__number {
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+.save-slot--auto::before {
+  content: '💾';
+  position: absolute;
+  top: var(--spacing-xs);
+  right: var(--spacing-xs);
+  font-size: var(--font-size-xs);
+  opacity: 0.6;
+}
+
+.save-slot--auto {
+  position: relative;
 }
 
 /* Mobile: single column */
