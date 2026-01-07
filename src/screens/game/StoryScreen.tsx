@@ -5,6 +5,7 @@
 
 import { useEffect, useContext, useCallback, useRef } from 'react';
 import { BottomPanelContext, ChoiceOption } from '../../components/BottomPanel/BottomPanelContext';
+import { LoadingSpinner } from '../../components/Loading';
 import { useSceneEngine } from '../../hooks/useSceneEngine';
 import { useGameLoader } from '../../hooks/useGameLoader';
 import { useChoiceEvaluator } from '../../hooks/useChoiceEvaluator';
@@ -157,8 +158,7 @@ export default function StoryScreen() {
   if (loading) {
     return (
       <div className="story-loading">
-        <div className="story-loading__spinner" />
-        <p>Loading game...</p>
+        <LoadingSpinner size="lg" label="Loading game..." />
       </div>
     );
   }
