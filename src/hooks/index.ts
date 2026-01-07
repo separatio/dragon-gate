@@ -16,3 +16,8 @@ export {
   createCombatShortcuts,
 } from './useKeyboardShortcuts';
 export type { KeyboardShortcut } from './useKeyboardShortcuts';
+export {
+  useTouchGestures,
+  createGameTouchHandlers,
+} from './useTouchGestures';
+export type { SwipeDirection, TouchGestureHandlers } from './useTouchGestures';
