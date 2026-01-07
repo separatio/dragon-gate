@@ -16,6 +16,7 @@ import {
 } from './BottomPanelContext';
 import TextDisplay from './panels/TextDisplay';
 import ActionPanel from './panels/ActionPanel';
+import SkillPanel from './panels/SkillPanel';
 
 interface BottomPanelProviderProps {
   children: ReactNode;
@@ -129,8 +130,9 @@ export function BottomPanel() {
 
       case 'skill':
         return (
-          <SkillPanelPlaceholder
+          <SkillPanel
             skills={context.state.skills}
+            categories={context.state.categories}
             onSelect={context.state.onSelect}
             onBack={context.state.onBack}
           />
@@ -184,23 +186,6 @@ function ChoicePanelPlaceholder({ choices }: ChoicePanelPlaceholderProps) {
           {choice.text}
         </button>
       ))}
-    </div>
-  );
-}
-
-interface SkillPanelPlaceholderProps {
-  skills: SkillOption[];
-  onSelect: (id: string) => void;
-  onBack: () => void;
-}
-
-function SkillPanelPlaceholder({ skills, onBack }: SkillPanelPlaceholderProps) {
-  return (
-    <div className="h-full flex items-center justify-between p-4">
-      <button className="btn btn-secondary" onClick={onBack}>
-        Back
-      </button>
-      <p className="text-muted">Skills: {skills.length} available (Plan 013)</p>
     </div>
   );
 }
