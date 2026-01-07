@@ -24,3 +24,5 @@ export {
   type ActionResult,
   type ActionEffect
 } from './ActionExecutor';
+
+export { EnemyAI } from './EnemyAI';
