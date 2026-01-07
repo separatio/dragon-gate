@@ -9,6 +9,7 @@ import { useSceneEngine } from '../../hooks/useSceneEngine';
 import { useGameLoader } from '../../hooks/useGameLoader';
 import { useChoiceEvaluator } from '../../hooks/useChoiceEvaluator';
 import { ScreenContext, Screen } from '../../ScreenProvider';
+import BattleScreen from './BattleScreen';
 import type { Choice } from '../../types';
 
 const DEFAULT_GAME_PATH = '/games/default/game.json';
@@ -18,7 +19,7 @@ export default function StoryScreen() {
   const panelContext = useContext(BottomPanelContext);
 
   const { game, loading, error, load } = useGameLoader();
-  const { state, start, advance, selectChoice } = useSceneEngine(game);
+  const { state, start, advance, selectChoice, handleBattleEnd } = useSceneEngine(game);
   const { evaluate } = useChoiceEvaluator(game);
 
   // Load game on mount
@@ -153,19 +154,15 @@ export default function StoryScreen() {
     );
   }
 
-  // Battle placeholder (will be implemented in later plans)
-  if (state.type === 'battle') {
+  // Battle mode - delegate to BattleScreen
+  if (state.type === 'battle' && game) {
     return (
-      <div className="battle-placeholder">
-        <h2>Battle Mode</h2>
-        <p>Combat system coming soon...</p>
-        <button
-          className="btn btn-primary"
-          onClick={() => screenContext?.setCurrentScreen(Screen.MainMenu)}
-        >
-          Return to Menu
-        </button>
-      </div>
+      <BattleScreen
+        scene={state.scene}
+        game={game}
+        player={game.characters.player}
+        onBattleEnd={handleBattleEnd}
+      />
     );
   }
 
