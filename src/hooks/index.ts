@@ -6,3 +6,4 @@ export { useGame } from './useGame';
 export { useGameLoader } from './useGameLoader';
 export { useSceneEngine } from './useSceneEngine';
 export { useTextAnimation } from './useTextAnimation';
+export { useChoiceEvaluator } from './useChoiceEvaluator';
