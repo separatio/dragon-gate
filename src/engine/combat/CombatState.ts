@@ -10,6 +10,7 @@ import type { GameDefinition } from '../../types/game';
 import { StatEngine } from '../stats/StatEngine';
 import { ModifierStack } from '../stats/ModifierStack';
 import { ActionExecutor, ActionEffect } from './ActionExecutor';
+import { EnemyAI } from './EnemyAI';
 
 /**
  * Combat phases representing the state machine states
@@ -144,8 +145,10 @@ export class CombatStateMachine {
 
   private statEngine: StatEngine;
   private actionExecutor: ActionExecutor;
+  private enemyAI: EnemyAI;
   private game: GameDefinition;
   private scene: Scene;
+  private enemyDefinitions: Map<string, Enemy> = new Map();
   private listeners: Set<() => void> = new Set();
 
   constructor(statEngine: StatEngine, game: GameDefinition, scene: Scene) {
@@ -153,6 +156,7 @@ export class CombatStateMachine {
     this.game = game;
     this.scene = scene;
     this.actionExecutor = new ActionExecutor(game);
+    this.enemyAI = new EnemyAI(game);
   }
 
   /**
@@ -160,6 +164,7 @@ export class CombatStateMachine {
    */
   initialize(player: Character, enemies: Enemy[]): void {
     this.combatants.clear();
+    this.enemyDefinitions.clear();
     this.battleLog = [];
     this.dialogQueue = [];
     this.pendingAction = null;
@@ -179,6 +184,9 @@ export class CombatStateMachine {
         false
       );
       this.combatants.set(enemyCombatant.id, enemyCombatant);
+
+      // Store enemy definition for AI config lookup
+      this.enemyDefinitions.set(enemyId, enemy);
     });
 
     this.phase = 'start';
@@ -529,29 +537,17 @@ export class CombatStateMachine {
    * Enemy AI selects and executes an action
    */
   private selectEnemyAction(enemy: Combatant): void {
-    // Simple AI: pick a random skill and target a random player
-    const skillId = enemy.skills.length > 0
-      ? enemy.skills[Math.floor(Math.random() * enemy.skills.length)]
-      : 'basic_attack';
+    // Get enemy definition for AI config
+    const enemyDef = this.enemyDefinitions.get(enemy.id);
 
-    const playerTargets = Array.from(this.combatants.values())
-      .filter(c => c.isPlayer && c.isAlive);
+    // Use EnemyAI to select action based on behavior pattern
+    const action = this.enemyAI.selectAction(
+      enemy,
+      this.getSnapshot(),
+      enemyDef?.ai
+    );
 
-    if (playerTargets.length === 0) {
-      this.endTurn();
-      return;
-    }
-
-    // Target random player (enhanced AI in Plan 026)
-    const target = playerTargets[Math.floor(Math.random() * playerTargets.length)];
-
-    this.pendingAction = {
-      type: 'skill',
-      actorId: enemy.id,
-      skillId,
-      targetIds: [target.id]
-    };
-
+    this.pendingAction = action;
     this.executeAction();
   }
 
