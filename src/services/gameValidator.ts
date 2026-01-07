@@ -8,14 +8,19 @@ export interface ValidationResult {
   errors: string[];
 }
 
+/** Type guard for Record<string, unknown> */
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
 export function validateGameDefinition(json: unknown): ValidationResult {
   const errors: string[] = [];
 
-  if (!json || typeof json !== 'object') {
+  if (!isRecord(json)) {
     return { valid: false, errors: ['Game definition must be an object'] };
   }
 
-  const game = json as Record<string, unknown>;
+  const game = json; // Type narrowed by isRecord guard
 
   // Required top-level fields
   if (!game.id || typeof game.id !== 'string') {
@@ -31,25 +36,24 @@ export function validateGameDefinition(json: unknown): ValidationResult {
   }
 
   // Theme validation
-  if (!game.theme || typeof game.theme !== 'object') {
+  if (!isRecord(game.theme)) {
     errors.push('Missing or invalid "theme" object');
   } else {
-    validateTheme(game.theme as Record<string, unknown>, errors);
+    validateTheme(game.theme, errors);
   }
 
   // Stats validation
-  if (!game.stats || typeof game.stats !== 'object') {
+  if (!isRecord(game.stats)) {
     errors.push('Missing or invalid "stats" object');
   } else {
-    validateStats(game.stats as Record<string, unknown>, errors);
+    validateStats(game.stats, errors);
   }
 
   // Characters validation
-  if (!game.characters || typeof game.characters !== 'object') {
+  if (!isRecord(game.characters)) {
     errors.push('Missing or invalid "characters" object');
   } else {
-    const chars = game.characters as Record<string, unknown>;
-    if (!chars.player || typeof chars.player !== 'object') {
+    if (!isRecord(game.characters.player)) {
       errors.push('Missing player character in "characters"');
     }
   }
@@ -92,12 +96,12 @@ export function validateGameDefinition(json: unknown): ValidationResult {
 function validateTheme(theme: Record<string, unknown>, errors: string[]): void {
   const requiredColors = ['primary', 'secondary', 'accent', 'background', 'text'];
 
-  if (!theme.colors || typeof theme.colors !== 'object') {
+  if (!isRecord(theme.colors)) {
     errors.push('Theme missing "colors" object');
     return;
   }
 
-  const colors = theme.colors as Record<string, unknown>;
+  const colors = theme.colors;
   requiredColors.forEach((color) => {
     if (!colors[color] || typeof colors[color] !== 'string') {
       errors.push(`Theme missing required color: ${color}`);
@@ -116,18 +120,16 @@ function validateStats(stats: Record<string, unknown>, errors: string[]): void {
 }
 
 function validateScene(scene: unknown, index: number, errors: string[]): void {
-  if (!scene || typeof scene !== 'object') {
+  if (!isRecord(scene)) {
     errors.push(`Scene ${index} is not an object`);
     return;
   }
 
-  const s = scene as Record<string, unknown>;
-
-  if (!s.id || typeof s.id !== 'string') {
+  if (!scene.id || typeof scene.id !== 'string') {
     errors.push(`Scene ${index} missing "id"`);
   }
 
-  if (!s.type || !['story', 'battle'].includes(s.type as string)) {
+  if (typeof scene.type !== 'string' || !['story', 'battle'].includes(scene.type)) {
     errors.push(`Scene ${index} has invalid "type" (must be "story" or "battle")`);
   }
 }
