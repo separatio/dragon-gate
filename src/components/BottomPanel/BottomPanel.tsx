@@ -19,6 +19,7 @@ import ActionPanel from './panels/ActionPanel';
 import SkillPanel from './panels/SkillPanel';
 import ItemPanel from './panels/ItemPanel';
 import TargetPanel from './panels/TargetPanel';
+import ChoicePanel from './panels/ChoicePanel';
 
 interface BottomPanelProviderProps {
   children: ReactNode;
@@ -125,7 +126,7 @@ export function BottomPanel() {
         );
 
       case 'choice':
-        return <ChoicePanelPlaceholder choices={context.state.choices} />;
+        return <ChoicePanel choices={context.state.choices} />;
 
       case 'action':
         return <ActionPanel actions={context.state.actions} />;
@@ -164,31 +165,6 @@ export function BottomPanel() {
   return (
     <div className="bottom-panel">
       <div className="content-container h-full">{renderContent()}</div>
-    </div>
-  );
-}
-
-// ============================================================================
-// Placeholder Components (will be replaced in later plans)
-// ============================================================================
-
-interface ChoicePanelPlaceholderProps {
-  choices: ChoiceOption[];
-}
-
-function ChoicePanelPlaceholder({ choices }: ChoicePanelPlaceholderProps) {
-  return (
-    <div className="h-full flex flex-col justify-center gap-2 p-4">
-      {choices.map((choice) => (
-        <button
-          key={choice.id}
-          className="btn btn-secondary w-full"
-          onClick={choice.onSelect}
-          disabled={choice.disabled}
-        >
-          {choice.text}
-        </button>
-      ))}
     </div>
   );
 }
