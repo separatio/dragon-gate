@@ -567,3 +567,30 @@ h1, h2, h3, h4, h5, h6 {
   right: 0;
   border-radius: var(--button-border-radius) 0 0 var(--button-border-radius);
 }
+
+/* ==========================================
+   SKILL PANEL
+   ========================================== */
+
+.skill-name {
+  font-weight: 500;
+  font-size: var(--font-size-sm);
+  text-align: center;
+  margin-bottom: var(--spacing-xs);
+}
+
+.skill-cost {
+  font-size: var(--font-size-xs);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.skill-cost.mp {
+  background: rgba(59, 130, 246, 0.3);
+  color: var(--color-info);
+}
+
+.skill-cost.hp {
+  background: rgba(239, 68, 68, 0.3);
+  color: var(--color-danger);
+}
