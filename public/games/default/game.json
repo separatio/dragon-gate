@@ -1,0 +1,210 @@
+{
+  "id": "default-adventure",
+  "title": "Dragon Gate Demo",
+  "version": "1.0.0",
+  "author": "Dragon Gate Team",
+  "description": "A short demo showcasing the Dragon Gate engine features.",
+
+  "theme": {
+    "colors": {
+      "primary": "#1a1a2e",
+      "secondary": "#16213e",
+      "accent": "#e94560",
+      "background": "#0f0f23",
+      "text": "#eaeaea",
+      "textMuted": "#888888",
+      "success": "#4ade80",
+      "warning": "#fbbf24",
+      "danger": "#ef4444"
+    },
+    "textbox": {
+      "background": "#1a1a2eee",
+      "text": "#eaeaea",
+      "border": "#e94560"
+    },
+    "typography": {
+      "fontFamily": "Georgia, serif",
+      "fontFamilyUI": "system-ui, sans-serif",
+      "baseFontSize": "18px",
+      "lineHeight": "1.6"
+    }
+  },
+
+  "stats": {
+    "primary": [
+      { "id": "str", "name": "Strength", "abbrev": "STR", "description": "Physical power", "defaultValue": 10, "minValue": 1, "maxValue": 99 },
+      { "id": "dex", "name": "Dexterity", "abbrev": "DEX", "description": "Speed and precision", "defaultValue": 10, "minValue": 1, "maxValue": 99 },
+      { "id": "con", "name": "Constitution", "abbrev": "CON", "description": "Health and endurance", "defaultValue": 10, "minValue": 1, "maxValue": 99 },
+      { "id": "int", "name": "Intelligence", "abbrev": "INT", "description": "Magic power", "defaultValue": 10, "minValue": 1, "maxValue": 99 },
+      { "id": "wis", "name": "Wisdom", "abbrev": "WIS", "description": "Magic defense", "defaultValue": 10, "minValue": 1, "maxValue": 99 },
+      { "id": "lck", "name": "Luck", "abbrev": "LCK", "description": "Fortune in battle", "defaultValue": 10, "minValue": 1, "maxValue": 99 }
+    ],
+    "derived": [
+      { "id": "maxHp", "name": "Max HP", "formula": "con * 10 + 50" },
+      { "id": "maxMp", "name": "Max MP", "formula": "int * 5 + wis * 2" },
+      { "id": "physAtk", "name": "Physical Attack", "formula": "str * 2 + dex" },
+      { "id": "physDef", "name": "Physical Defense", "formula": "con * 2 + str" },
+      { "id": "magAtk", "name": "Magic Attack", "formula": "int * 3" },
+      { "id": "magDef", "name": "Magic Defense", "formula": "wis * 2 + int" },
+      { "id": "speed", "name": "Speed", "formula": "dex * 2 + lck" },
+      { "id": "critRate", "name": "Critical Rate", "formula": "min(lck * 0.5 + dex * 0.2, 50)" },
+      { "id": "critDmg", "name": "Critical Damage", "formula": "150 + lck * 0.5" }
+    ],
+    "combatFormulas": {
+      "physicalDamage": "(attackerPhysAtk - defenderPhysDef * 0.5) * (1 + variance * 0.1)",
+      "magicDamage": "(attackerMagAtk - defenderMagDef * 0.3) * (1 + variance * 0.1)",
+      "criticalCheck": "random(100) < critRate",
+      "turnOrder": "speed + random(10)"
+    }
+  },
+
+  "characters": {
+    "player": {
+      "id": "hero",
+      "name": "Hero",
+      "baseStats": { "str": 12, "dex": 10, "con": 11, "int": 8, "wis": 9, "lck": 10 },
+      "skills": ["slash", "guard", "heal"]
+    }
+  },
+
+  "enemies": [
+    {
+      "id": "slime",
+      "name": "Slime",
+      "baseStats": { "str": 5, "dex": 3, "con": 8, "int": 2, "wis": 2, "lck": 5 },
+      "skills": ["tackle"],
+      "drops": [],
+      "exp": 10
+    },
+    {
+      "id": "goblin",
+      "name": "Goblin",
+      "baseStats": { "str": 8, "dex": 12, "con": 6, "int": 4, "wis": 3, "lck": 7 },
+      "skills": ["slash", "tackle"],
+      "drops": [],
+      "exp": 25
+    }
+  ],
+
+  "skills": [
+    { "id": "slash", "name": "Slash", "type": "physical", "mpCost": 0, "power": 100, "description": "A basic sword strike." },
+    { "id": "tackle", "name": "Tackle", "type": "physical", "mpCost": 0, "power": 80, "description": "A simple body blow." },
+    { "id": "guard", "name": "Guard", "type": "defense", "mpCost": 0, "effect": "reduceDamage", "value": 50, "description": "Reduce incoming damage by 50%." },
+    { "id": "heal", "name": "Heal", "type": "magic", "mpCost": 5, "power": 50, "target": "self", "description": "Restore HP based on WIS." }
+  ],
+
+  "items": [
+    { "id": "potion", "name": "Potion", "type": "consumable", "effect": "healHp", "value": 30, "description": "Restores 30 HP." },
+    { "id": "ether", "name": "Ether", "type": "consumable", "effect": "healMp", "value": 15, "description": "Restores 15 MP." }
+  ],
+
+  "startingScene": "intro",
+  "scenes": [
+    {
+      "id": "intro",
+      "type": "story",
+      "content": [
+        { "type": "text", "value": "You awaken in a dim forest clearing. The last thing you remember is passing through an ancient stone archway—the Dragon Gate." },
+        { "type": "text", "value": "Mist swirls around your feet as you rise. Somewhere ahead, you hear rustling in the underbrush." }
+      ],
+      "choices": [
+        { "id": "investigate", "text": "Investigate the sound", "nextScene": "encounter" },
+        { "id": "wait", "text": "Wait and observe", "nextScene": "wait_scene" }
+      ]
+    },
+    {
+      "id": "wait_scene",
+      "type": "story",
+      "content": [
+        { "type": "text", "value": "You crouch low and wait. A small slime emerges from the bushes, wobbling toward you curiously." },
+        { "type": "text", "value": "It doesn't seem aggressive... yet." }
+      ],
+      "choices": [
+        { "id": "fight", "text": "Strike first!", "nextScene": "battle_slime" },
+        { "id": "flee", "text": "Slowly back away", "nextScene": "forest_path" }
+      ]
+    },
+    {
+      "id": "encounter",
+      "type": "story",
+      "content": [
+        { "type": "text", "value": "You push through the brush and come face-to-face with a goblin! It snarls and raises a crude dagger." }
+      ],
+      "choices": [
+        { "id": "fight_goblin", "text": "Draw your weapon!", "nextScene": "battle_goblin" }
+      ]
+    },
+    {
+      "id": "battle_slime",
+      "type": "battle",
+      "enemies": ["slime"],
+      "background": "forest",
+      "victoryScene": "victory_slime",
+      "defeatScene": "defeat",
+      "triggers": []
+    },
+    {
+      "id": "battle_goblin",
+      "type": "battle",
+      "enemies": ["goblin"],
+      "background": "forest",
+      "victoryScene": "victory_goblin",
+      "defeatScene": "defeat",
+      "triggers": [
+        {
+          "condition": "enemy.hp < enemy.maxHp * 0.3",
+          "once": true,
+          "action": {
+            "type": "dialog",
+            "speaker": "Goblin",
+            "text": "Grrr... You're stronger than you look, human!"
+          }
+        }
+      ]
+    },
+    {
+      "id": "victory_slime",
+      "type": "story",
+      "content": [
+        { "type": "text", "value": "The slime dissolves into goo. Not much of a threat after all." },
+        { "type": "text", "value": "You continue deeper into the forest..." }
+      ],
+      "choices": [
+        { "id": "continue", "text": "Continue", "nextScene": "forest_path" }
+      ]
+    },
+    {
+      "id": "victory_goblin",
+      "type": "story",
+      "content": [
+        { "type": "text", "value": "The goblin falls with a final screech. You catch your breath and look around." },
+        { "type": "text", "value": "Through the trees, you spot a worn path leading deeper into the unknown." }
+      ],
+      "choices": [
+        { "id": "continue", "text": "Follow the path", "nextScene": "forest_path" }
+      ]
+    },
+    {
+      "id": "forest_path",
+      "type": "story",
+      "content": [
+        { "type": "text", "value": "The forest path winds onward. This is just the beginning of your journey through the Dragon Gate..." },
+        { "type": "text", "value": "[Demo End - Thank you for playing!]" }
+      ],
+      "choices": [
+        { "id": "restart", "text": "Return to Title", "nextScene": "intro" }
+      ]
+    },
+    {
+      "id": "defeat",
+      "type": "story",
+      "content": [
+        { "type": "text", "value": "Darkness closes in as you fall..." },
+        { "type": "text", "value": "[Game Over]" }
+      ],
+      "choices": [
+        { "id": "retry", "text": "Try Again", "nextScene": "intro" }
+      ]
+    }
+  ]
+}
