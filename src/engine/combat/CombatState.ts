@@ -11,6 +11,8 @@ import { StatEngine } from '../stats/StatEngine';
 import { ModifierStack } from '../stats/ModifierStack';
 import { ActionExecutor, ActionEffect } from './ActionExecutor';
 import { EnemyAI } from './EnemyAI';
+import { BattleTriggerEngine } from './BattleTriggerEngine';
+import type { BattleTriggerAction } from '../../types/scene';
 
 /**
  * Combat phases representing the state machine states
@@ -146,6 +148,7 @@ export class CombatStateMachine {
   private statEngine: StatEngine;
   private actionExecutor: ActionExecutor;
   private enemyAI: EnemyAI;
+  private triggerEngine: BattleTriggerEngine;
   private game: GameDefinition;
   private scene: Scene;
   private enemyDefinitions: Map<string, Enemy> = new Map();
@@ -157,6 +160,12 @@ export class CombatStateMachine {
     this.scene = scene;
     this.actionExecutor = new ActionExecutor(game);
     this.enemyAI = new EnemyAI(game);
+    this.triggerEngine = new BattleTriggerEngine(game);
+
+    // Initialize triggers from scene
+    if (scene.triggers) {
+      this.triggerEngine.setTriggers(scene.triggers);
+    }
   }
 
   /**
@@ -598,10 +607,158 @@ export class CombatStateMachine {
   }
 
   /**
-   * Check battle triggers (placeholder - implementation in Plan 027)
+   * Check battle triggers and handle any that fire
    */
   private checkTriggers(): void {
-    // Full implementation in Plan 027
+    const results = this.triggerEngine.evaluate(this.getSnapshot());
+
+    for (const result of results) {
+      this.handleTriggerAction(result.action);
+    }
+  }
+
+  /**
+   * Handle a trigger action
+   */
+  private handleTriggerAction(action: BattleTriggerAction): void {
+    switch (action.type) {
+      case 'dialog':
+        this.queueDialog(action.speaker ?? 'Narrator', action.text);
+        break;
+
+      case 'spawn': {
+        // Find enemy definition and spawn it
+        const enemyDef = this.game.enemies?.find(e => e.id === action.enemyId);
+        if (enemyDef) {
+          this.spawnEnemy(enemyDef);
+        }
+        break;
+      }
+
+      case 'buff': {
+        const target = action.target
+          ? this.combatants.get(action.target)
+          : this.getCurrentCombatant();
+        if (target) {
+          target.modifiers.addModifier(
+            {
+              id: `trigger_buff_${Date.now()}`,
+              name: 'Battle Effect',
+              description: 'Applied by battle trigger',
+              effects: [{
+                stat: action.stat,
+                valueType: 'flat',
+                value: action.value
+              }],
+              duration: action.duration ?? 3,
+              stackable: false
+            },
+            'buff'
+          );
+          this.recalculateStats(target);
+          this.log(`${target.name} gained a buff!`);
+        }
+        break;
+      }
+
+      case 'heal': {
+        const target = action.target
+          ? this.combatants.get(action.target)
+          : this.getCurrentCombatant();
+        if (target && target.isAlive) {
+          const previousHp = target.currentHp;
+          target.currentHp = Math.min(target.maxHp, target.currentHp + action.amount);
+          const healed = target.currentHp - previousHp;
+          this.log(`${target.name} recovered ${healed} HP!`);
+        }
+        break;
+      }
+
+      case 'damage': {
+        const target = action.target
+          ? this.combatants.get(action.target)
+          : this.getCurrentCombatant();
+        if (target && target.isAlive) {
+          target.currentHp = Math.max(0, target.currentHp - action.amount);
+          this.log(`${target.name} took ${action.amount} damage!`);
+          if (target.currentHp <= 0) {
+            target.isAlive = false;
+            this.log(`${target.name} was defeated!`);
+          }
+        }
+        break;
+      }
+
+      case 'flee': {
+        const target = action.target
+          ? this.combatants.get(action.target)
+          : null;
+        if (target && !target.isPlayer) {
+          target.isAlive = false;
+          this.log(`${target.name} fled the battle!`);
+        }
+        break;
+      }
+
+      case 'transform': {
+        const target = action.target
+          ? this.combatants.get(action.target)
+          : this.getCurrentCombatant();
+        const newEnemy = this.game.enemies?.find(e => e.id === action.newEnemyId);
+        if (target && newEnemy && !target.isPlayer) {
+          // Transform: update name and stats but keep HP percentage
+          const hpPercent = target.currentHp / target.maxHp;
+          const newStats = this.statEngine.getCompleteStats(newEnemy.baseStats, 1);
+
+          target.name = newEnemy.name;
+          target.baseStats = { ...newEnemy.baseStats };
+          target.currentStats = newStats;
+          target.maxHp = newStats.MaxHP ?? newStats.maxHp ?? 100;
+          target.maxMp = newStats.MaxMP ?? newStats.maxMp ?? 50;
+          target.currentHp = Math.floor(target.maxHp * hpPercent);
+          target.skills = newEnemy.skills ?? [];
+
+          // Update enemy definition for AI
+          this.enemyDefinitions.set(target.id, newEnemy);
+
+          this.log(`${target.name} transformed!`);
+        }
+        break;
+      }
+
+      case 'multi':
+        // Execute multiple actions
+        for (const subAction of action.actions) {
+          this.handleTriggerAction(subAction);
+        }
+        break;
+    }
+  }
+
+  /**
+   * Spawn a new enemy mid-battle
+   */
+  private spawnEnemy(enemy: Enemy): void {
+    // Find unique ID
+    const baseId = enemy.id;
+    let enemyId = baseId;
+    let counter = 1;
+    while (this.combatants.has(enemyId)) {
+      enemyId = `${baseId}_${counter++}`;
+    }
+
+    const enemyCombatant = this.createCombatant(
+      { ...enemy, id: enemyId },
+      false
+    );
+    this.combatants.set(enemyCombatant.id, enemyCombatant);
+    this.enemyDefinitions.set(enemyId, enemy);
+
+    // Add to turn queue with average initiative
+    const avgInitiative = this.turnQueue.reduce((sum, e) => sum + e.initiative, 0) / this.turnQueue.length;
+    this.turnQueue.push({ combatantId: enemyId, initiative: avgInitiative });
+
+    this.log(`${enemy.name} appeared!`);
   }
 
   /**

@@ -26,3 +26,9 @@ export {
 } from './ActionExecutor';
 
 export { EnemyAI } from './EnemyAI';
+
+export {
+  BattleTriggerEngine,
+  type TriggerResult,
+  type TriggerContext
+} from './BattleTriggerEngine';
