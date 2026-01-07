@@ -9,3 +9,14 @@ export { ChoiceEvaluator } from './ChoiceEvaluator';
 export type { EvaluatedChoice } from './ChoiceEvaluator';
 
 export { FormulaParser, formulaParser } from './formula';
+
+export {
+  CombatStateMachine,
+  type CombatPhase,
+  type Combatant,
+  type CombatAction,
+  type CombatActionType,
+  type TurnQueueEntry,
+  type DialogEntry,
+  type CombatSnapshot
+} from './combat';
