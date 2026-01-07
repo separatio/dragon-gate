@@ -66,21 +66,78 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ==========================================
-   LAYOUT UTILITIES
+   GAME LAYOUT (70/30 ADV Style)
    ========================================== */
 
+.game-container {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: var(--color-background);
+}
+
 .visual-area {
-  height: var(--visual-area-height);
+  flex: 0 0 var(--visual-area-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--color-background);
 }
 
 .bottom-panel {
-  height: var(--bottom-panel-height);
+  flex: 0 0 var(--bottom-panel-height);
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-surface);
+  border-top: 1px solid var(--color-surface-elevated);
+  overflow: hidden;
 }
 
+/* Content width constraint */
 .content-width {
   max-width: var(--content-max-width);
   margin: 0 auto;
   padding: 0 var(--content-padding);
+}
+
+.content-container {
+  width: 100%;
+  max-width: min(var(--content-max-width), 1200px);
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+}
+
+/* ==========================================
+   LANDSCAPE ENFORCEMENT
+   ========================================== */
+
+@media screen and (orientation: portrait) {
+  .game-container::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: var(--color-background);
+    z-index: 9999;
+  }
+
+  .game-container::after {
+    content: 'Please rotate your device to landscape mode';
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+    color: var(--color-text);
+    font-family: var(--font-family-ui);
+    font-size: var(--font-size-lg);
+    z-index: 10000;
+  }
 }
 
 /* ==========================================
