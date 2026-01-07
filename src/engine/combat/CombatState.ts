@@ -6,8 +6,10 @@
 import type { Character, Enemy } from '../../types/character';
 import type { Scene } from '../../types/scene';
 import type { StatBlock } from '../../types/stats';
+import type { GameDefinition } from '../../types/game';
 import { StatEngine } from '../stats/StatEngine';
 import { ModifierStack } from '../stats/ModifierStack';
+import { ActionExecutor, ActionEffect } from './ActionExecutor';
 
 /**
  * Combat phases representing the state machine states
@@ -141,12 +143,16 @@ export class CombatStateMachine {
   private previousPhase: CombatPhase = 'start';
 
   private statEngine: StatEngine;
+  private actionExecutor: ActionExecutor;
+  private game: GameDefinition;
   private scene: Scene;
   private listeners: Set<() => void> = new Set();
 
-  constructor(statEngine: StatEngine, scene: Scene) {
+  constructor(statEngine: StatEngine, game: GameDefinition, scene: Scene) {
     this.statEngine = statEngine;
+    this.game = game;
     this.scene = scene;
+    this.actionExecutor = new ActionExecutor(game);
   }
 
   /**
@@ -339,19 +345,65 @@ export class CombatStateMachine {
   }
 
   /**
-   * Execute a skill action (placeholder - full implementation in Plan 024)
+   * Execute a skill action using ActionExecutor
    */
   private executeSkill(actor: Combatant, action: CombatAction): void {
-    // Placeholder: log the skill use
-    // Full damage calculation in Plan 024/025
-    this.log(`${actor.name} uses ${action.skillId ?? 'attack'}!`);
+    const skill = this.actionExecutor.getSkillById(action.skillId ?? '');
 
-    // Apply basic damage to targets (simplified for now)
+    if (!skill) {
+      // Fallback to basic attack if skill not found
+      this.executeBasicAttack(actor, action);
+      return;
+    }
+
+    // Gather targets
+    const targets = action.targetIds
+      ?.map(id => this.combatants.get(id))
+      .filter((t): t is Combatant => t !== undefined) ?? [];
+
+    // Execute through ActionExecutor
+    const result = this.actionExecutor.executeSkill(actor, skill, targets);
+
+    // Log the result
+    this.log(result.message);
+
+    if (!result.success) {
+      // Action failed (e.g., not enough MP)
+      return;
+    }
+
+    // Log individual effects
+    this.logActionEffects(result.effects);
+
+    // Log defeated targets
+    for (const targetId of result.killedTargets) {
+      const target = this.combatants.get(targetId);
+      if (target) {
+        this.log(`${target.name} was defeated!`);
+      }
+    }
+
+    // Recalculate stats for affected targets (buffs/debuffs may have changed them)
+    for (const effect of result.effects) {
+      if (effect.type === 'buff' || effect.type === 'debuff') {
+        const target = this.combatants.get(effect.targetId);
+        if (target) {
+          this.recalculateStats(target);
+        }
+      }
+    }
+  }
+
+  /**
+   * Fallback basic attack when skill is not found
+   */
+  private executeBasicAttack(actor: Combatant, action: CombatAction): void {
+    this.log(`${actor.name} attacks!`);
+
     if (action.targetIds) {
       for (const targetId of action.targetIds) {
         const target = this.combatants.get(targetId);
         if (target && target.isAlive) {
-          // Basic attack damage (proper formula in Plan 025)
           const attack = actor.currentStats.Attack ?? actor.currentStats.attack ?? 10;
           const defense = target.currentStats.Defense ?? target.currentStats.defense ?? 5;
           const baseDamage = Math.max(1, Math.floor(attack * (100 / (100 + defense))));
@@ -370,11 +422,80 @@ export class CombatStateMachine {
   }
 
   /**
-   * Execute an item action (placeholder - full implementation in Plan 024)
+   * Execute an item action using ActionExecutor
    */
   private executeItem(actor: Combatant, action: CombatAction): void {
-    this.log(`${actor.name} uses ${action.itemId ?? 'item'}!`);
-    // Full implementation in Plan 024
+    const item = this.actionExecutor.getItemById(action.itemId ?? '');
+
+    if (!item) {
+      this.log(`${actor.name} tries to use an item, but nothing happens!`);
+      return;
+    }
+
+    // Gather targets
+    const targets = action.targetIds
+      ?.map(id => this.combatants.get(id))
+      .filter((t): t is Combatant => t !== undefined) ?? [];
+
+    // Execute through ActionExecutor
+    const result = this.actionExecutor.executeItem(actor, item, targets);
+
+    // Log the result
+    this.log(result.message);
+
+    // Log individual effects
+    this.logActionEffects(result.effects);
+
+    // Log defeated targets
+    for (const targetId of result.killedTargets) {
+      const target = this.combatants.get(targetId);
+      if (target) {
+        this.log(`${target.name} was defeated!`);
+      }
+    }
+
+    // Recalculate stats for affected targets
+    for (const effect of result.effects) {
+      if (effect.type === 'buff' || effect.type === 'debuff') {
+        const target = this.combatants.get(effect.targetId);
+        if (target) {
+          this.recalculateStats(target);
+        }
+      }
+    }
+  }
+
+  /**
+   * Log action effects to the battle log
+   */
+  private logActionEffects(effects: ActionEffect[]): void {
+    for (const effect of effects) {
+      const target = this.combatants.get(effect.targetId);
+      if (!target) continue;
+
+      switch (effect.type) {
+        case 'damage': {
+          const critText = effect.isCritical ? ' Critical hit!' : '';
+          this.log(`${target.name} takes ${effect.value} damage!${critText}`);
+          break;
+        }
+        case 'heal':
+          this.log(`${target.name} recovers ${effect.value} HP!`);
+          break;
+        case 'healMp':
+          this.log(`${target.name} recovers ${effect.value} MP!`);
+          break;
+        case 'buff':
+          this.log(`${target.name}'s ${effect.statAffected ?? 'stats'} increased!`);
+          break;
+        case 'debuff':
+          this.log(`${target.name}'s ${effect.statAffected ?? 'stats'} decreased!`);
+          break;
+        case 'revive':
+          this.log(`${target.name} was revived with ${effect.value} HP!`);
+          break;
+      }
+    }
   }
 
   /**

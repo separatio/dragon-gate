@@ -12,3 +12,15 @@ export {
   type DialogEntry,
   type CombatSnapshot
 } from './CombatState';
+
+export {
+  DamageCalculator,
+  type DamageResult,
+  type DamageContext
+} from './DamageCalculator';
+
+export {
+  ActionExecutor,
+  type ActionResult,
+  type ActionEffect
+} from './ActionExecutor';
