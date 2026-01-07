@@ -99,3 +99,25 @@ export type {
 } from './game';
 
 export { DEFAULT_GAME_SETTINGS } from './game';
+
+// Save types
+export type {
+  SavedPlayerData,
+  SavedStoryData,
+  SaveMetadata,
+  SaveData,
+  SaveSlotInfo,
+  SaveResult,
+  LoadResult,
+  AutoSaveConfig,
+} from './save';
+
+export {
+  SAVE_VERSION,
+  DEFAULT_AUTO_SAVE_CONFIG,
+  SAVE_STORAGE_KEYS,
+  MAX_SAVE_SLOTS,
+  createEmptySaveSlotInfo,
+  formatPlayTime,
+  formatTimestamp,
+} from './save';
