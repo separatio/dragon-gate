@@ -153,6 +153,89 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ==========================================
+   TEXT DISPLAY (Narrative)
+   ========================================== */
+
+.text-display {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  user-select: none;
+}
+
+.text-display-speaker {
+  font-family: var(--font-family-ui);
+  font-weight: 600;
+  font-size: var(--font-size-lg);
+  color: var(--color-accent);
+  margin-bottom: var(--spacing-sm);
+}
+
+.text-display-content {
+  flex: 1;
+  font-size: var(--font-size-base);
+  line-height: var(--line-height);
+  overflow-y: auto;
+}
+
+.text-display-indicator {
+  text-align: right;
+  padding-top: var(--spacing-sm);
+}
+
+.tap-indicator {
+  font-family: var(--font-family-ui);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.tap-indicator-dim {
+  opacity: 0.5;
+  animation: none;
+}
+
+/* Word fade-in animation */
+.fade-in-word {
+  opacity: 0;
+  animation: fadeInWord var(--text-fade-duration) ease-out forwards;
+}
+
+@keyframes fadeInWord {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Reduce motion: instant display */
+@media (prefers-reduced-motion: reduce) {
+  .fade-in-word {
+    opacity: 1;
+    animation: none;
+  }
+
+  .tap-indicator {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+/* ==========================================
    BUTTON STYLES
    ========================================== */
 
