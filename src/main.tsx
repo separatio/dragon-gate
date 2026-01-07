@@ -5,6 +5,7 @@ import './index.css'
 import { AccessibilityProvider, ThemeProvider } from './theme'
 import { GameProvider } from './GameProvider.tsx'
 import { ScreenProvider } from './ScreenProvider.tsx'
+import { ErrorBoundary } from './components/ErrorBoundary'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -12,7 +13,9 @@ createRoot(document.getElementById('root')!).render(
       <ThemeProvider>
         <GameProvider>
           <ScreenProvider>
-            <App />
+            <ErrorBoundary>
+              <App />
+            </ErrorBoundary>
           </ScreenProvider>
         </GameProvider>
       </ThemeProvider>
