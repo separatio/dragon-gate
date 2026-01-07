@@ -1,27 +1,32 @@
-import { useContext } from 'react'
-import BottomSection from './components/BottomSection'
-import CenterSection from './components/CenterSection'
-import MainMenu from './screens/full/MainMenuScreen'
-import { ScreenContext, Screen } from './ScreenProvider'
+import { useContext } from 'react';
+import VisualArea from './components/VisualArea';
+import MainMenu from './screens/full/MainMenuScreen';
+import { ScreenContext, Screen } from './ScreenProvider';
 
 export default function App() {
-  const context = useContext(ScreenContext)
+  const context = useContext(ScreenContext);
 
   if (!context) {
-    // Handle the case where the context is undefined
-    return <div>ScreenContext is not available.</div>
+    return null;
   }
 
-  const { screenState } = context
+  const { screenState } = context;
 
+  // Full-screen views (no 70/30 layout)
   if (screenState.currentScreen === Screen.MainMenu) {
-    return <MainMenu />
+    return <MainMenu />;
   }
 
+  // Game layout: 70/30 split
   return (
-    <div className="h-screen flex flex-col w-full mx-auto">
-      <CenterSection />
-      <BottomSection />
+    <div className="game-container">
+      <VisualArea />
+      {/* BottomPanel will be added in Plan 009 */}
+      <div className="bottom-panel">
+        <div className="flex items-center justify-center h-full">
+          <p className="text-muted font-ui">Bottom Panel (Plan 009)</p>
+        </div>
+      </div>
     </div>
-  )
+  );
 }
