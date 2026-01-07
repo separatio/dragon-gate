@@ -14,6 +14,7 @@ import {
   ItemOption,
   TargetOption,
 } from './BottomPanelContext';
+import TextDisplay from './panels/TextDisplay';
 
 interface BottomPanelProviderProps {
   children: ReactNode;
@@ -112,7 +113,7 @@ export function BottomPanel() {
 
       case 'text':
         return (
-          <TextDisplayPlaceholder
+          <TextDisplay
             content={context.state.content}
             speaker={context.state.speaker}
             onComplete={context.state.onComplete}
@@ -164,24 +165,6 @@ export function BottomPanel() {
 // ============================================================================
 // Placeholder Components (will be replaced in later plans)
 // ============================================================================
-
-interface TextDisplayPlaceholderProps {
-  content: string;
-  speaker?: string;
-  onComplete?: () => void;
-}
-
-function TextDisplayPlaceholder({ content, speaker, onComplete }: TextDisplayPlaceholderProps) {
-  return (
-    <div className="textbox h-full flex flex-col justify-between" onClick={onComplete}>
-      <div>
-        {speaker && <p className="font-ui font-bold text-accent mb-1">{speaker}</p>}
-        <p>{content}</p>
-      </div>
-      {onComplete && <p className="text-muted text-sm text-right">Click to continue...</p>}
-    </div>
-  );
-}
 
 interface ChoicePanelPlaceholderProps {
   choices: ChoiceOption[];
