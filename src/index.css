@@ -594,3 +594,22 @@ h1, h2, h3, h4, h5, h6 {
   background: rgba(239, 68, 68, 0.3);
   color: var(--color-danger);
 }
+
+/* ==========================================
+   ITEM PANEL
+   ========================================== */
+
+.item-name {
+  font-weight: 500;
+  font-size: var(--font-size-sm);
+  text-align: center;
+  margin-bottom: var(--spacing-xs);
+}
+
+.item-quantity {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  background: var(--color-surface);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
