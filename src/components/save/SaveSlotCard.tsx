@@ -5,6 +5,7 @@
 
 import type { SaveSlotInfo } from '../../types/save';
 import { formatPlayTime, formatTimestamp } from '../../types/save';
+import { AUTO_SAVE_SLOT } from '../../hooks/useAutoSave';
 
 interface SaveSlotCardProps {
   /** Slot number */
@@ -29,6 +30,9 @@ export default function SaveSlotCard({
   onDelete,
   isSelected,
 }: SaveSlotCardProps) {
+  const isAutoSlot = slot === AUTO_SAVE_SLOT;
+  const slotLabel = isAutoSlot ? 'Auto' : `Slot ${slot + 1}`;
+
   const handleClick = () => {
     onSelect(slot);
   };
@@ -44,12 +48,12 @@ export default function SaveSlotCard({
   if (info.isEmpty) {
     return (
       <button
-        className={`save-slot save-slot--empty ${isSelected ? 'save-slot--selected' : ''}`}
+        className={`save-slot save-slot--empty ${isSelected ? 'save-slot--selected' : ''} ${isAutoSlot ? 'save-slot--auto' : ''}`}
         onClick={handleClick}
         disabled={mode === 'load'}
-        aria-label={`Empty slot ${slot + 1}`}
+        aria-label={`Empty ${slotLabel}`}
       >
-        <div className="save-slot__number">Slot {slot + 1}</div>
+        <div className="save-slot__number">{slotLabel}</div>
         <div className="save-slot__empty-label">
           {mode === 'save' ? 'New Save' : 'Empty'}
         </div>
@@ -63,12 +67,12 @@ export default function SaveSlotCard({
 
   return (
     <button
-      className={`save-slot save-slot--filled ${isSelected ? 'save-slot--selected' : ''}`}
+      className={`save-slot save-slot--filled ${isSelected ? 'save-slot--selected' : ''} ${isAutoSlot ? 'save-slot--auto' : ''}`}
       onClick={handleClick}
-      aria-label={`Slot ${slot + 1}: ${metadata.playerName} - ${metadata.sceneName ?? 'Unknown'}`}
+      aria-label={`${slotLabel}: ${metadata.playerName} - ${metadata.sceneName ?? 'Unknown'}`}
     >
       <div className="save-slot__header">
-        <span className="save-slot__number">Slot {slot + 1}</span>
+        <span className="save-slot__number">{slotLabel}</span>
         {onDelete && (
           <button
             className="save-slot__delete"

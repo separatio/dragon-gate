@@ -3,11 +3,12 @@
  * Integrates scene engine with UI components for story mode gameplay
  */
 
-import { useEffect, useContext, useCallback } from 'react';
+import { useEffect, useContext, useCallback, useRef } from 'react';
 import { BottomPanelContext, ChoiceOption } from '../../components/BottomPanel/BottomPanelContext';
 import { useSceneEngine } from '../../hooks/useSceneEngine';
 import { useGameLoader } from '../../hooks/useGameLoader';
 import { useChoiceEvaluator } from '../../hooks/useChoiceEvaluator';
+import { useAutoSave } from '../../hooks/useAutoSave';
 import { ScreenContext, Screen } from '../../ScreenProvider';
 import BattleScreen from './BattleScreen';
 import type { Choice } from '../../types';
@@ -21,6 +22,14 @@ export default function StoryScreen() {
   const { game, loading, error, load } = useGameLoader();
   const { state, start, advance, selectChoice, handleBattleEnd } = useSceneEngine(game);
   const { evaluate } = useChoiceEvaluator(game);
+  const { isSaving, triggerAutoSave, config } = useAutoSave({
+    gameId: game?.id ?? null,
+    player: game?.characters.player ?? null,
+    enabled: state.type !== 'battle',
+  });
+
+  // Track last scene ID to detect scene changes
+  const lastSceneIdRef = useRef<string | null>(null);
 
   // Load game on mount
   useEffect(() => {
@@ -33,6 +42,22 @@ export default function StoryScreen() {
       start();
     }
   }, [game, state.type, start]);
+
+  // Auto-save on scene change
+  useEffect(() => {
+    if (!config.onSceneChange) return;
+    if (state.type !== 'story' && state.type !== 'choices') return;
+
+    const currentSceneId = state.scene?.id;
+    if (!currentSceneId) return;
+
+    // Only auto-save when entering a new scene
+    if (currentSceneId !== lastSceneIdRef.current) {
+      lastSceneIdRef.current = currentSceneId;
+      // Use scene ID as name since Scene type doesn't have a name property
+      triggerAutoSave(currentSceneId, currentSceneId);
+    }
+  }, [state, config.onSceneChange, triggerAutoSave]);
 
   // Handle text completion - advance to next content
   const handleTextComplete = useCallback(() => {
@@ -171,6 +196,14 @@ export default function StoryScreen() {
 
   return (
     <>
+      {/* Auto-save indicator */}
+      {isSaving && (
+        <div className="auto-save-indicator">
+          <span className="auto-save-indicator__icon">💾</span>
+          <span className="auto-save-indicator__text">Saving...</span>
+        </div>
+      )}
+
       {showAdvanceHint && (
         <div className="story-advance-hint">Click or press Enter to continue</div>
       )}
