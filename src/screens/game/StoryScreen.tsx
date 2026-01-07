@@ -11,6 +11,7 @@ import { useGameLoader } from '../../hooks/useGameLoader';
 import { useChoiceEvaluator } from '../../hooks/useChoiceEvaluator';
 import { useAutoSave } from '../../hooks/useAutoSave';
 import { useKeyboardShortcuts, createGameShortcuts } from '../../hooks/useKeyboardShortcuts';
+import { useTouchGestures } from '../../hooks/useTouchGestures';
 import { ScreenContext, Screen } from '../../ScreenProvider';
 import BattleScreen from './BattleScreen';
 import type { Choice } from '../../types';
@@ -162,6 +163,20 @@ export default function StoryScreen() {
   useKeyboardShortcuts({
     enabled: state.type !== 'battle',
     shortcuts,
+  });
+
+  // Touch gestures for mobile
+  const touchHandlers = useMemo(
+    () => ({
+      onTap: state.type === 'story' ? handleAdvance : undefined,
+      onSwipeDown: () => screenContext?.setCurrentScreen(Screen.MainMenu),
+    }),
+    [state.type, handleAdvance, screenContext]
+  );
+
+  useTouchGestures({
+    enabled: state.type !== 'battle',
+    handlers: touchHandlers,
   });
 
   // Loading state
