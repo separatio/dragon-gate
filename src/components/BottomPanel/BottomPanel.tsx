@@ -15,6 +15,7 @@ import {
   TargetOption,
 } from './BottomPanelContext';
 import TextDisplay from './panels/TextDisplay';
+import ActionPanel from './panels/ActionPanel';
 
 interface BottomPanelProviderProps {
   children: ReactNode;
@@ -124,7 +125,7 @@ export function BottomPanel() {
         return <ChoicePanelPlaceholder choices={context.state.choices} />;
 
       case 'action':
-        return <ActionPanelPlaceholder actions={context.state.actions} />;
+        return <ActionPanel actions={context.state.actions} />;
 
       case 'skill':
         return (
@@ -181,27 +182,6 @@ function ChoicePanelPlaceholder({ choices }: ChoicePanelPlaceholderProps) {
           disabled={choice.disabled}
         >
           {choice.text}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-interface ActionPanelPlaceholderProps {
-  actions: ActionOption[];
-}
-
-function ActionPanelPlaceholder({ actions }: ActionPanelPlaceholderProps) {
-  return (
-    <div className="h-full flex items-center justify-center gap-4 p-4">
-      {actions.map((action) => (
-        <button
-          key={action.id}
-          className={`btn ${action.variant === 'primary' ? 'btn-primary' : 'btn-secondary'}`}
-          onClick={action.onSelect}
-          disabled={action.disabled}
-        >
-          {action.label}
         </button>
       ))}
     </div>
