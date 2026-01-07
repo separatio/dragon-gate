@@ -7,3 +7,5 @@ export type { LoadResult } from './gameLoader';
 
 export { validateGameDefinition } from './gameValidator';
 export type { ValidationResult } from './gameValidator';
+
+export { SaveManager, useSaveManager } from './SaveManager';
