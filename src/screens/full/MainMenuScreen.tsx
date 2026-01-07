@@ -13,7 +13,7 @@ function MainMenuScreen() {
   const { setCurrentScreen } = context
 
   const handleNewGame = () => {
-    setCurrentScreen(Screen.CharacterCreation)
+    setCurrentScreen(Screen.Story)
   }
 
   const handleLoadGame = () => {
