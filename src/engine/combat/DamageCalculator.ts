@@ -248,7 +248,7 @@ export class DamageCalculator {
       minDamage = Math.max(1, Math.floor(formulaParser.compute(formula, contextMin)));
       maxDamage = Math.max(1, Math.floor(formulaParser.compute(formula, contextMax)));
     } catch {
-      // Fallback
+      // Fallback to simple damage range if formula fails (e.g., invalid custom formula)
       const attack = damageType === 'physical' ? contextMin.Attack : contextMin.MagicPower;
       const defense = damageType === 'physical' ? contextMin.EnemyDef : contextMin.EnemyRes;
       const base = attack * (100 / (100 + defense)) * skillPower / 100;
