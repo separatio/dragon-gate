@@ -18,6 +18,7 @@ import TextDisplay from './panels/TextDisplay';
 import ActionPanel from './panels/ActionPanel';
 import SkillPanel from './panels/SkillPanel';
 import ItemPanel from './panels/ItemPanel';
+import TargetPanel from './panels/TargetPanel';
 
 interface BottomPanelProviderProps {
   children: ReactNode;
@@ -151,7 +152,7 @@ export function BottomPanel() {
 
       case 'target':
         return (
-          <TargetPanelPlaceholder
+          <TargetPanel
             targets={context.state.targets}
             onSelect={context.state.onSelect}
             onBack={context.state.onBack}
@@ -188,23 +189,6 @@ function ChoicePanelPlaceholder({ choices }: ChoicePanelPlaceholderProps) {
           {choice.text}
         </button>
       ))}
-    </div>
-  );
-}
-
-interface TargetPanelPlaceholderProps {
-  targets: TargetOption[];
-  onSelect: (id: string) => void;
-  onBack: () => void;
-}
-
-function TargetPanelPlaceholder({ targets, onBack }: TargetPanelPlaceholderProps) {
-  return (
-    <div className="h-full flex items-center justify-between p-4">
-      <button className="btn btn-secondary" onClick={onBack}>
-        Back
-      </button>
-      <p className="text-muted">Targets: {targets.length} available (Plan 015)</p>
     </div>
   );
 }

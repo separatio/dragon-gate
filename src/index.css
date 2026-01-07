@@ -613,3 +613,91 @@ h1, h2, h3, h4, h5, h6 {
   padding: 2px 6px;
   border-radius: 4px;
 }
+
+/* ==========================================
+   TARGET PANEL
+   ========================================== */
+
+.target-panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-md);
+}
+
+.target-back {
+  align-self: flex-start;
+  margin-bottom: var(--spacing-sm);
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  font-family: var(--font-family-ui);
+  cursor: pointer;
+}
+
+.target-back:hover {
+  color: var(--color-text);
+}
+
+.target-groups {
+  display: flex;
+  gap: var(--spacing-xl);
+  justify-content: center;
+  flex: 1;
+  align-items: center;
+}
+
+.target-group-title {
+  font-family: var(--font-family-ui);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.target-list {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.target-button {
+  min-width: 100px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-surface-elevated);
+  border: 2px solid transparent;
+  border-radius: var(--button-border-radius);
+  color: var(--color-text);
+  font-family: var(--font-family-ui);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.target-button.enemy:hover {
+  border-color: var(--color-danger);
+}
+
+.target-button.ally:hover {
+  border-color: var(--color-success);
+}
+
+.target-name {
+  display: block;
+  font-weight: 500;
+  margin-bottom: var(--spacing-xs);
+}
+
+.target-hp {
+  height: 4px;
+  background: var(--color-surface);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.target-hp-bar {
+  height: 100%;
+  background: var(--color-danger);
+  transition: width var(--transition-normal);
+}
+
+.target-hp-bar.ally-bar {
+  background: var(--color-success);
+}
