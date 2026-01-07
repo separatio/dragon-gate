@@ -13,6 +13,8 @@ import { ActionExecutor, ActionEffect } from './ActionExecutor';
 import { EnemyAI } from './EnemyAI';
 import { BattleTriggerEngine } from './BattleTriggerEngine';
 import type { BattleTriggerAction, BattleDialogChoice } from '../../types/scene';
+import type { BattleResult, BattleRewards, DroppedItem, SurvivorData } from '../../types/combat';
+import type { ItemDrop } from '../../types/items';
 
 /**
  * Combat phases representing the state machine states
@@ -128,6 +130,8 @@ export interface CombatSnapshot {
   dialogQueue: DialogEntry[];
   /** Current dialog entry (if in dialog phase) */
   currentDialog: DialogEntry | null;
+  /** Battle result (set when victory/defeat) */
+  battleResult: BattleResult | null;
 }
 
 /**
@@ -145,6 +149,7 @@ export class CombatStateMachine {
   private pendingAction: CombatAction | null = null;
   private battleLog: string[] = [];
   private dialogQueue: DialogEntry[] = [];
+  private battleResult: BattleResult | null = null;
   private previousPhase: CombatPhase = 'start';
 
   private statEngine: StatEngine;
@@ -179,6 +184,7 @@ export class CombatStateMachine {
     this.battleLog = [];
     this.dialogQueue = [];
     this.pendingAction = null;
+    this.battleResult = null;
 
     // Create player combatant
     const playerCombatant = this.createCombatant(player, true);
@@ -599,12 +605,114 @@ export class CombatStateMachine {
 
     if (allPlayersDead) {
       this.phase = 'defeat';
+      this.battleResult = this.createBattleResult(false, players);
       this.log('Defeat...');
       this.emit();
     } else if (allEnemiesDead) {
       this.phase = 'victory';
-      this.log('Victory!');
+      const rewards = this.calculateRewards();
+      this.battleResult = this.createBattleResult(true, players, rewards);
+      this.logRewards(rewards);
       this.emit();
+    }
+  }
+
+  /**
+   * Calculate rewards from defeated enemies
+   */
+  private calculateRewards(): BattleRewards {
+    let totalExp = 0;
+    let totalGold = 0;
+    const droppedItems: DroppedItem[] = [];
+
+    // Sum up rewards from all defeated enemies
+    for (const enemyId of this.enemyDefinitions.keys()) {
+      const enemyDef = this.enemyDefinitions.get(enemyId);
+      if (!enemyDef) continue;
+
+      // Add exp and gold
+      totalExp += enemyDef.exp;
+      totalGold += enemyDef.gold ?? 0;
+
+      // Roll for item drops
+      if (enemyDef.drops) {
+        for (const drop of enemyDef.drops) {
+          if (this.rollDrop(drop)) {
+            // Check if item already in drops, merge if so
+            const existing = droppedItems.find(d => d.itemId === drop.itemId);
+            if (existing) {
+              existing.count += drop.count ?? 1;
+            } else {
+              droppedItems.push({
+                itemId: drop.itemId,
+                count: drop.count ?? 1
+              });
+            }
+          }
+        }
+      }
+    }
+
+    return {
+      exp: totalExp,
+      gold: totalGold,
+      items: droppedItems
+    };
+  }
+
+  /**
+   * Roll for an item drop based on chance
+   */
+  private rollDrop(drop: ItemDrop): boolean {
+    const roll = Math.random() * 100;
+    return roll < drop.chance;
+  }
+
+  /**
+   * Create battle result object
+   */
+  private createBattleResult(
+    victory: boolean,
+    players: Combatant[],
+    rewards?: BattleRewards
+  ): BattleResult {
+    const survivingPlayers: SurvivorData[] = players
+      .filter(p => p.isAlive)
+      .map(p => ({
+        id: p.id,
+        name: p.name,
+        remainingHp: p.currentHp,
+        maxHp: p.maxHp,
+        remainingMp: p.currentMp,
+        maxMp: p.maxMp
+      }));
+
+    return {
+      victory,
+      rewards,
+      survivingPlayers,
+      turnCount: this.turnNumber
+    };
+  }
+
+  /**
+   * Log rewards to battle log
+   */
+  private logRewards(rewards: BattleRewards): void {
+    this.log('Victory!');
+
+    if (rewards.exp > 0) {
+      this.log(`Gained ${rewards.exp} EXP!`);
+    }
+
+    if (rewards.gold > 0) {
+      this.log(`Found ${rewards.gold} gold!`);
+    }
+
+    for (const item of rewards.items) {
+      const itemDef = this.game.items?.find(i => i.id === item.itemId);
+      const itemName = itemDef?.name ?? item.itemId;
+      this.log(`Obtained ${itemName}${item.count > 1 ? ` x${item.count}` : ''}!`);
     }
   }
 
@@ -912,7 +1020,8 @@ export class CombatStateMachine {
       pendingAction: this.pendingAction ? { ...this.pendingAction } : null,
       battleLog: [...this.battleLog],
       dialogQueue: [...this.dialogQueue],
-      currentDialog: this.dialogQueue[0] ?? null
+      currentDialog: this.dialogQueue[0] ?? null,
+      battleResult: this.battleResult
     };
   }
 
