@@ -1,4 +1,4 @@
-import React, { createContext, useState, ReactNode, useCallback } from 'react'
+import React, { createContext, useState, ReactNode, useCallback, useMemo } from 'react'
 
 enum GameMode {
   CreateCharacter,
@@ -43,12 +43,15 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({
     setGameState((prev) => ({ ...prev, gameMode: mode }))
   }, [])
 
-  const value: GameContextType = {
-    gameState,
-    setDisplayedText,
-    setSceneFinished,
-    setGameMode,
-  }
+  const value = useMemo<GameContextType>(
+    () => ({
+      gameState,
+      setDisplayedText,
+      setSceneFinished,
+      setGameMode,
+    }),
+    [gameState, setDisplayedText, setSceneFinished, setGameMode]
+  )
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>
 }
