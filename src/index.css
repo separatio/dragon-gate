@@ -97,13 +97,6 @@ h1, h2, h3, h4, h5, h6 {
   overflow: hidden;
 }
 
-/* Content width constraint */
-.content-width {
-  max-width: var(--content-max-width);
-  margin: 0 auto;
-  padding: 0 var(--content-padding);
-}
-
 .content-container {
   width: 100%;
   max-width: min(var(--content-max-width), 1200px);
@@ -586,12 +579,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .skill-cost.mp {
-  background: rgba(59, 130, 246, 0.3);
+  background: color-mix(in srgb, var(--color-info) 30%, transparent);
   color: var(--color-info);
 }
 
 .skill-cost.hp {
-  background: rgba(239, 68, 68, 0.3);
+  background: color-mix(in srgb, var(--color-danger) 30%, transparent);
   color: var(--color-danger);
 }
 
@@ -853,26 +846,6 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
-.battle-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  gap: var(--spacing-md);
-  color: var(--color-text);
-  background: var(--color-background);
-}
-
-.battle-placeholder h2 {
-  color: var(--color-accent);
-  margin: 0;
-}
-
-.battle-placeholder p {
-  color: var(--color-text-muted);
-}
-
 /* ==========================================
    BATTLE SCREEN
    ========================================== */
@@ -1032,43 +1005,6 @@ h1, h2, h3, h4, h5, h6 {
   background: rgba(0, 0, 0, 0.5);
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--border-radius);
-}
-
-/* Battle result overlay */
-.battle-result {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.7);
-  pointer-events: auto;
-}
-
-.battle-result__title {
-  font-family: var(--font-family-ui);
-  font-size: var(--font-size-3xl);
-  font-weight: 700;
-  margin-bottom: var(--spacing-lg);
-}
-
-.battle-result__title.victory {
-  color: var(--color-success);
-  text-shadow: 0 0 20px var(--color-success);
-}
-
-.battle-result__title.defeat {
-  color: var(--color-danger);
-  text-shadow: 0 0 20px var(--color-danger);
-}
-
-.battle-result__rewards {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-sm);
-  color: var(--color-text);
 }
 
 /* Mobile responsive */
