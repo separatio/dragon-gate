@@ -224,7 +224,7 @@ export class ActionExecutor {
    * Execute a buff skill
    */
   private executeBuffSkill(
-    actor: Combatant,
+    _actor: Combatant,
     skill: Skill,
     targets: Combatant[]
   ): ActionEffect[] {
@@ -267,7 +267,7 @@ export class ActionExecutor {
    * Execute a debuff skill
    */
   private executeDebuffSkill(
-    actor: Combatant,
+    _actor: Combatant,
     skill: Skill,
     targets: Combatant[]
   ): ActionEffect[] {

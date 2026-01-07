@@ -221,10 +221,6 @@ export class FormulaParser {
     return this.tokens[this.pos];
   }
 
-  private peek(offset = 0): Token {
-    return this.tokens[this.pos + offset];
-  }
-
   private advance(): Token {
     return this.tokens[this.pos++];
   }
