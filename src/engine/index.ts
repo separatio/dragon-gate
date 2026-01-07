@@ -18,5 +18,11 @@ export {
   type CombatActionType,
   type TurnQueueEntry,
   type DialogEntry,
-  type CombatSnapshot
+  type CombatSnapshot,
+  DamageCalculator,
+  type DamageResult,
+  type DamageContext,
+  ActionExecutor,
+  type ActionResult,
+  type ActionEffect
 } from './combat';

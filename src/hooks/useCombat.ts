@@ -12,6 +12,7 @@ import {
 import { StatEngine } from '../engine/stats/StatEngine';
 import type { Character, Enemy } from '../types/character';
 import type { Scene } from '../types/scene';
+import type { GameDefinition } from '../types/game';
 
 /**
  * Return type for useCombat hook
@@ -39,11 +40,12 @@ export interface UseCombatReturn {
  * Hook for managing turn-based combat
  *
  * @param statEngine - The stat engine for calculating combat stats
+ * @param game - The game definition for skill/item lookups
  * @returns Combat state and actions
  *
  * @example
  * ```tsx
- * const { snapshot, startBattle, selectAction, selectTargets, isInBattle } = useCombat(statEngine);
+ * const { snapshot, startBattle, selectAction, selectTargets, isInBattle } = useCombat(statEngine, game);
  *
  * // Start a battle
  * startBattle(battleScene, player, [goblin, wolf]);
@@ -59,23 +61,25 @@ export interface UseCombatReturn {
  * }
  * ```
  */
-export function useCombat(statEngine: StatEngine): UseCombatReturn {
+export function useCombat(statEngine: StatEngine, game: GameDefinition): UseCombatReturn {
   const machineRef = useRef<CombatStateMachine | null>(null);
   const [initialized, setInitialized] = useState(false);
 
   // Use useSyncExternalStore for tear-free subscription
   const snapshot = useSyncExternalStore(
-    // Subscribe function
+    // Subscribe function - re-subscribes when initialized changes
     useCallback(
       (callback) => {
         if (!machineRef.current) return () => {};
         return machineRef.current.subscribe(callback);
       },
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       [initialized]
     ),
     // Get snapshot function
     useCallback(
       () => machineRef.current?.getSnapshot() ?? null,
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       [initialized]
     ),
     // Get server snapshot (SSR)
@@ -87,12 +91,12 @@ export function useCombat(statEngine: StatEngine): UseCombatReturn {
    */
   const startBattle = useCallback(
     (scene: Scene, player: Character, enemies: Enemy[]) => {
-      machineRef.current = new CombatStateMachine(statEngine, scene);
+      machineRef.current = new CombatStateMachine(statEngine, game, scene);
       machineRef.current.initialize(player, enemies);
       setInitialized(true);
       machineRef.current.start();
     },
-    [statEngine]
+    [statEngine, game]
   );
 
   /**
