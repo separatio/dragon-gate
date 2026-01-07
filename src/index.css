@@ -1,6 +1,185 @@
 @import 'tailwindcss';
+@import './styles/variables.css';
+
+/* ==========================================
+   BASE STYLES
+   ========================================== */
+
+/* Apply font scaling from accessibility settings */
+html {
+  font-size: calc(16px * var(--a11y-font-scale));
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--color-background);
+  color: var(--color-text);
+  line-height: var(--line-height);
+  min-height: 100vh;
+  margin: 0;
+}
+
+/* ==========================================
+   TYPOGRAPHY
+   ========================================== */
 
 p {
-  padding: 0.5em;
-  font-size: large;
+  margin: 0;
+  padding: var(--spacing-sm);
+  font-size: var(--font-size-base);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-family-ui);
+  line-height: var(--line-height-tight);
+  margin: 0;
+}
+
+/* ==========================================
+   UTILITY CLASSES
+   ========================================== */
+
+/* Background utilities */
+.bg-surface {
+  background-color: var(--color-surface);
+}
+
+.bg-surface-elevated {
+  background-color: var(--color-surface-elevated);
+}
+
+.bg-primary {
+  background-color: var(--color-primary);
+}
+
+/* Text utilities */
+.text-muted {
+  color: var(--color-text-muted);
+}
+
+.text-accent {
+  color: var(--color-accent);
+}
+
+.font-ui {
+  font-family: var(--font-family-ui);
+}
+
+/* ==========================================
+   LAYOUT UTILITIES
+   ========================================== */
+
+.visual-area {
+  height: var(--visual-area-height);
+}
+
+.bottom-panel {
+  height: var(--bottom-panel-height);
+}
+
+.content-width {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: 0 var(--content-padding);
+}
+
+/* ==========================================
+   TEXTBOX STYLES
+   ========================================== */
+
+.textbox {
+  background: var(--textbox-bg);
+  color: var(--textbox-text);
+  border: 2px solid var(--textbox-border);
+  border-radius: var(--textbox-border-radius);
+  padding: var(--textbox-padding);
+}
+
+/* ==========================================
+   BUTTON STYLES
+   ========================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--button-padding-y) var(--button-padding-x);
+  border-radius: var(--button-border-radius);
+  font-family: var(--font-family-ui);
+  font-weight: var(--button-font-weight);
+  font-size: var(--font-size-base);
+  min-height: var(--button-min-height);
+  cursor: pointer;
+  transition: background-color var(--transition-fast),
+              border-color var(--transition-fast),
+              transform var(--transition-fast);
+  border: 2px solid transparent;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-primary {
+  background-color: var(--color-accent);
+  color: var(--color-text-inverted);
+  border-color: var(--color-accent);
+}
+
+.btn-primary:hover {
+  background-color: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--color-text);
+  border-color: var(--color-accent);
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-accent);
+  color: var(--color-text-inverted);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ==========================================
+   FOCUS STYLES (Accessibility)
+   ========================================== */
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* ==========================================
+   SCROLLBAR STYLING
+   ========================================== */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-accent);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent-hover);
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-accent) var(--color-surface);
 }

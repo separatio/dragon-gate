@@ -1,0 +1,185 @@
+/**
+ * Dragon Gate CSS Variables
+ *
+ * These CSS custom properties form the foundation of the theming system.
+ * ThemeProvider will override these values dynamically based on the loaded game.
+ */
+
+:root {
+  /* ========================================
+     COLORS
+     ======================================== */
+
+  /* Primary palette */
+  --color-primary: #1a1a2e;
+  --color-secondary: #16213e;
+  --color-accent: #e94560;
+  --color-accent-hover: #d63d56;
+
+  /* Backgrounds */
+  --color-background: #0f0f23;
+  --color-surface: #1a1a2e;
+  --color-surface-elevated: #242444;
+
+  /* Text */
+  --color-text: #eaeaea;
+  --color-text-muted: #888888;
+  --color-text-inverted: #1a1a2e;
+
+  /* Status colors */
+  --color-success: #4ade80;
+  --color-warning: #fbbf24;
+  --color-danger: #ef4444;
+  --color-info: #3b82f6;
+
+  /* RGB versions for alpha compositing */
+  --color-accent-rgb: 233, 69, 96;
+  --color-background-rgb: 15, 15, 35;
+
+  /* ========================================
+     TEXTBOX
+     ======================================== */
+
+  --textbox-bg: rgba(26, 26, 46, 0.95);
+  --textbox-text: #eaeaea;
+  --textbox-border: #e94560;
+  --textbox-padding: 1.25rem;
+  --textbox-border-radius: 8px;
+
+  /* ========================================
+     TYPOGRAPHY
+     ======================================== */
+
+  /* Font families */
+  --font-family: Georgia, 'Times New Roman', serif;
+  --font-family-ui: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-family-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+
+  /* Font sizes */
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 2rem;
+
+  /* Line height */
+  --line-height: 1.6;
+  --line-height-tight: 1.25;
+  --line-height-relaxed: 1.75;
+
+  /* ========================================
+     SPACING
+     ======================================== */
+
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+
+  /* ========================================
+     LAYOUT
+     ======================================== */
+
+  /* 70/30 split for visual/bottom panel */
+  --visual-area-height: 70%;
+  --bottom-panel-height: 30%;
+
+  /* Content constraints */
+  --content-max-width: 1200px;
+  --content-padding: var(--spacing-md);
+
+  /* Border radius */
+  --border-radius: 8px;
+  --border-radius-sm: 4px;
+  --border-radius-lg: 12px;
+
+  /* ========================================
+     ANIMATION
+     ======================================== */
+
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow: 400ms ease;
+
+  /* Text animation */
+  --text-fade-duration: 80ms;
+  --text-word-delay: 60ms;
+
+  /* ========================================
+     BUTTONS
+     ======================================== */
+
+  --button-padding-x: 1rem;
+  --button-padding-y: 0.5rem;
+  --button-border-radius: 6px;
+  --button-font-weight: 500;
+  --button-min-height: 44px;
+
+  /* ========================================
+     ACCESSIBILITY OVERRIDES
+     Player preferences can modify these
+     ======================================== */
+
+  --a11y-font-scale: 1;
+  --a11y-reduce-motion: 0;
+  --a11y-high-contrast: 0;
+}
+
+/* ==========================================
+   SYSTEM PREFERENCE DETECTION
+   ========================================== */
+
+/* Reduce motion when system prefers it */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --a11y-reduce-motion: 1;
+    --transition-fast: 0ms;
+    --transition-normal: 0ms;
+    --transition-slow: 0ms;
+    --text-fade-duration: 0ms;
+    --text-word-delay: 0ms;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: more) {
+  :root {
+    --a11y-high-contrast: 1;
+    --color-text: #ffffff;
+    --color-text-muted: #cccccc;
+    --color-background: #000000;
+    --color-surface: #111111;
+    --textbox-bg: rgba(0, 0, 0, 0.98);
+    --textbox-border: #ffffff;
+  }
+}
+
+/* ==========================================
+   FONT SCALE CLASSES
+   Applied to html element for accessibility
+   ========================================== */
+
+.font-scale-small {
+  --a11y-font-scale: 0.85;
+}
+
+.font-scale-normal {
+  --a11y-font-scale: 1;
+}
+
+.font-scale-large {
+  --a11y-font-scale: 1.15;
+}
+
+.font-scale-xlarge {
+  --a11y-font-scale: 1.3;
+}
+
+/* Dyslexia-friendly font option */
+.dyslexia-font {
+  --font-family: 'OpenDyslexic', 'Comic Sans MS', sans-serif;
+}
