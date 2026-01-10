@@ -4,4 +4,3 @@ coverage
 dist
 public
 src-tauri
-pnpm-lock.yaml
