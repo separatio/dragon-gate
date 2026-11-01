@@ -25,3 +25,6 @@ vite.config.d.ts
 vite.config.js
 
 .eslintcache
+
+# Agent worktrees
+.claude/worktrees
